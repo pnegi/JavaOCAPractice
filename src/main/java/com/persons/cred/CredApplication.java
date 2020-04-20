@@ -10,7 +10,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,9 +27,9 @@ public class CredApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args){
-		Set<WebSite> preeWebSites = new HashSet<WebSite>();
-		Set<WebSite> chanWebSites = new HashSet<WebSite>();
-		Set<WebSite> aahuWebSites = new HashSet<WebSite>();
+		Set<WebSite> preeWebSites = new HashSet<>();
+		Set<WebSite> chanWebSites = new HashSet<>();
+		Set<WebSite> aahuWebSites = new HashSet<>();
 		WebSite amazonUKSite = WebSite.builder()
 				.id(1)
 				.name("Amazon UK")

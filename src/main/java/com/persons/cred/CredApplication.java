@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -59,13 +60,13 @@ public class CredApplication implements CommandLineRunner {
 		Person pree = Person.builder().id(1).firstName("Pree")
 				.lastName("negirastogi")
 				.email("pnr@pp.com")
-				.dob(new Date("8/2/1991"))
+                .dob(LocalDate.of(1991, 8, 2))
 				.relatedWebsites(preeWebSites)
 				.build();
 		Person chan = Person.builder().id(2).firstName("Chan")
 				.lastName("nrastogi")
 				.email("cbnr@pp.com")
-				.dob(new Date("2/28/1990"))
+                .dob(LocalDate.of(1990, 2, 28))
 				.relatedWebsites(preeWebSites)
 				.build();
 
@@ -73,7 +74,7 @@ public class CredApplication implements CommandLineRunner {
 		Person aahu = Person.builder().id(3).firstName("Aahu")
 				.lastName("nrastogi")
 				.email("anr@pp.com")
-				.dob(new Date("11/11/2019"))
+                .dob(LocalDate.of(2019, 11, 11))
 				.relatedWebsites(aahuWebSites)
 				.build();
 		personRepository.save(pree);

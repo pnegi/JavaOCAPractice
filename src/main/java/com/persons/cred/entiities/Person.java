@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -24,13 +24,12 @@ public class Person {
     @Column
     private String lastName;
     @Column
-    private Date dob;
+    private LocalDate dob;
     @Column
     private String email;
-    @ManyToMany
-    @JoinTable(
-            name = "persons_related_websites",
-            joinColumns = @JoinColumn(name = "person_id"),
-            inverseJoinColumns = @JoinColumn(name = "website_id"))
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "persons_related_websites", joinColumns = {
+            @JoinColumn(name = "person_id") },
+            inverseJoinColumns = { @JoinColumn(name = "website_id") })
     Set<WebSite> relatedWebsites;
 }

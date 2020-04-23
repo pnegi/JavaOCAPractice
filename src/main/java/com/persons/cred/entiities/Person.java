@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Data
@@ -17,6 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Person {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column
     private int id;
     @Column
@@ -31,5 +32,5 @@ public class Person {
     @JoinTable(name = "persons_related_websites", joinColumns = {
             @JoinColumn(name = "person_id") },
             inverseJoinColumns = { @JoinColumn(name = "website_id") })
-    Set<WebSite> relatedWebsites;
+    List<WebSite> relatedWebsites;
 }

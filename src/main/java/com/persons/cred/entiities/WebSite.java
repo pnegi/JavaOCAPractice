@@ -5,11 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import java.util.Set;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Data
@@ -18,6 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class WebSite {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column
     private int id;
     @Column
@@ -27,5 +25,5 @@ public class WebSite {
     @Column
     private String alias;
     @ManyToMany(mappedBy = "relatedWebsites")
-    Set<Person> relatedPersons;
+    List<Person> relatedPersons;
 }

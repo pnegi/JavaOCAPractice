@@ -2,21 +2,20 @@ package com.persons.cred;
 
 import com.persons.cred.entiities.Person;
 import com.persons.cred.repositories.PersonRepository;
-import com.persons.cred.repositories.WebsiteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 @SpringBootApplication
 public class CredApplication implements CommandLineRunner {
 
 	@Autowired
 	PersonRepository personRepository;
-	@Autowired
-	WebsiteRepository websiteRepository;
 
 	public static void main(String[] args){
 		SpringApplication.run(CredApplication.class, args);
@@ -35,7 +34,7 @@ public class CredApplication implements CommandLineRunner {
                 .dob(LocalDate.of(1990, 7, 4))
 				.build();
 
-		personRepository.save(preeti);
-		personRepository.save(chandra);
+		List<Person> people = Arrays.asList(preeti, chandra);
+		personRepository.saveAll(people);
 	}
 }

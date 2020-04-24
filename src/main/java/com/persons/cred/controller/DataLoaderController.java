@@ -24,8 +24,4 @@ public class DataLoaderController {
         dataLoaderService.saveDataFromInputToDb(input);
         return "success";
     }
-
-
-
-
 }

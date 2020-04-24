@@ -47,10 +47,21 @@ public class DataLoaderService {
 
     public void mapWebsiteToPerson(List<WebSite> webSiteList , List<Person> personList, XSSFCell userId, XSSFCell pwd) {
         //TODO: try to use pattern matches from this link http://tutorials.jenkov.com/java-regex/pattern.html
-        if (userId!=null && !userId.getStringCellValue().isEmpty() && userId.getStringCellValue().contains("negi")){
-            Optional<Person> person = personList.stream().filter(p -> p.getLastName().toLowerCase().contains("negi")).findFirst();
-            person.ifPresent(prsn -> prsn.getRelatedWebsites().add(webSiteList.stream().findFirst().orElse(null)));
+        switch (userId.getCellType()){
+            case NUMERIC:
+            case BLANK:
+            case BOOLEAN:
+            case ERROR:
+                break;
+            case STRING:
+                if (!userId.getStringCellValue().isEmpty() && userId.getStringCellValue().contains("negi")){
+                    Optional<Person> person = personList.stream().filter(p -> p.getLastName().toLowerCase().contains("negi")).findFirst();
+                    person.ifPresent(prsn -> prsn.getRelatedWebsites().add(webSiteList.stream().findFirst().orElse(null)));
+                }
+                break;
+            default:
         }
+
     }
 
     public List<WebSite> storeIfNewElseGetSitesLikeRowWebsite(XSSFRow row) {

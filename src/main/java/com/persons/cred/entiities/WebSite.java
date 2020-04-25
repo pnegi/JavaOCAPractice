@@ -18,12 +18,16 @@ public class WebSite {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column
     private int id;
+
     @Column
     private String name;
+
     @Column
     private String url;
+
     @Column
     private String alias;
-    @ManyToMany(mappedBy = "relatedWebsites")
-    List<Person> relatedPersons;
+
+    @OneToMany(mappedBy = "webSite")
+    List<PersonsWebsites> personsWebsitesList;
 }

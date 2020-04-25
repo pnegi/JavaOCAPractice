@@ -6,33 +6,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.List;
+import java.io.Serializable;
 
 @Entity
 @Data
-@Table
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Person {
+public class PersonsWebsites implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column
     private int id;
 
-    @Column
-    private String firstName;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "person_id")
+    Person person;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "website_id")
+    WebSite webSite;
 
     @Column
-    private String lastName;
+    String userId;
 
     @Column
-    private LocalDate dob;
-
-    @Column
-    private String email;
-
-    @OneToMany(mappedBy = "person")
-    List<PersonsWebsites> personsWebsitesList;
+    String password;
 }

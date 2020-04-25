@@ -1,8 +1,10 @@
 package com.persons.cred.services;
 
 import com.persons.cred.entiities.Person;
+import com.persons.cred.entiities.PersonsWebsites;
 import com.persons.cred.entiities.WebSite;
 import com.persons.cred.repositories.PersonRepository;
+import com.persons.cred.repositories.PersonsWebsitesRepository;
 import com.persons.cred.repositories.WebsiteRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
@@ -14,9 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
+import static com.persons.cred.CommonConstants.CHAN_PATTERN_STRING;
+import static com.persons.cred.CommonConstants.PREE_PATTERN_STRING;
+import static java.util.regex.Pattern.matches;
 
 @Service
 @Slf4j
@@ -25,6 +32,9 @@ public class DataLoaderService {
     private PersonRepository personRepository;
     @Autowired
     private WebsiteRepository websiteRepository;
+    @Autowired
+    PersonsWebsitesRepository personsWebsitesRepository;
+
 
     public void saveDataFromInputToDb(InputStream input) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(input)){
@@ -37,41 +47,71 @@ public class DataLoaderService {
             while (rowIterator.hasNext()) {
                 XSSFRow row = (XSSFRow) rowIterator.next();
                 List<WebSite> webSiteList = storeIfNewElseGetSitesLikeRowWebsite(row);
-                mapWebsiteToPerson(webSiteList ,personList, row.getCell(1), row.getCell(2));
+                if(!webSiteList.isEmpty()) {
+                    String userIdValue = getStringValue(row.getCell(1));
+                    String pwdValue = getStringValue(row.getCell(2));
+                    if (userIdValue!=null && pwdValue!=null)
+                        mapPersonWithWebsiteCredentials(webSiteList, personList, userIdValue, pwdValue);
+                }
             }
-            personRepository.saveAll(personList);
         } catch (Exception e){
-            log.error(e.getMessage());
+            log.error(e.getMessage() + e.getCause());
         }
     }
 
-    public void mapWebsiteToPerson(List<WebSite> webSiteList , List<Person> personList, XSSFCell userId, XSSFCell pwd) {
-        //TODO: try to use pattern matches from this link http://tutorials.jenkov.com/java-regex/pattern.html
-        switch (userId.getCellType()){
+    private String getStringValue(XSSFCell cell) {
+
+        String value = null;
+        switch (cell.getCellType()) {
             case NUMERIC:
+                value = String.valueOf(cell.getNumericCellValue());
+                break;
+            case STRING:
+                value = cell.getStringCellValue().toLowerCase();
+                break;
             case BLANK:
             case BOOLEAN:
             case ERROR:
                 break;
-            case STRING:
-                if (!userId.getStringCellValue().isEmpty() && userId.getStringCellValue().contains("negi")){
-                    Optional<Person> person = personList.stream().filter(p -> p.getLastName().toLowerCase().contains("negi")).findFirst();
-                    person.ifPresent(prsn -> prsn.getRelatedWebsites().add(webSiteList.stream().findFirst().orElse(null)));
-                }
-                break;
             default:
         }
-
+        return value;
     }
 
     public List<WebSite> storeIfNewElseGetSitesLikeRowWebsite(XSSFRow row) {
-        String websiteName = row.getCell(0).getStringCellValue();
-        List<WebSite> webSiteList = websiteRepository.findByNameContainingIgnoreCase(websiteName);
-        if (webSiteList.isEmpty()){
+        List<WebSite> webSiteList = new ArrayList<>();
+        if(row.getCell(0) != null) {
+            String websiteName = row.getCell(0).getStringCellValue();
+            webSiteList = websiteRepository.findByNameContainingIgnoreCase(websiteName);
+            if (webSiteList.isEmpty()){
             WebSite webSite = WebSite.builder().name(websiteName).url(websiteName).alias(websiteName).build();
             websiteRepository.save(webSite);
             webSiteList.add(webSite);
         }
+        }
         return webSiteList;
+    }
+    private void mapPersonWithWebsiteCredentials(List<WebSite> webSiteList, List<Person> personList, String userIdValue, String pwdValue) {
+        Optional<Person> person = getPerson(personList, userIdValue);
+        if(person.isPresent()){
+            PersonsWebsites personsWebsites = PersonsWebsites.builder()
+                    .webSite(webSiteList.stream().findFirst().orElse(null))
+                    .person(person.get())
+                    .userId(userIdValue)
+                    .password(pwdValue)
+                    .build();
+            personsWebsitesRepository.save(personsWebsites);
+        }else{
+        log.info("Person not found for userId? {}",userIdValue);
+        }
+    }
+
+    private Optional<Person> getPerson(List<Person> personList, String userIdValue) {
+        Optional<Person> person = Optional.empty();
+        if (matches(PREE_PATTERN_STRING, userIdValue))
+            person = personList.stream().filter(p -> p.getFirstName().toLowerCase().matches(PREE_PATTERN_STRING)).findFirst();
+        if (matches(CHAN_PATTERN_STRING, userIdValue))
+            person = personList.stream().filter(p -> p.getFirstName().toLowerCase().matches(CHAN_PATTERN_STRING)).findFirst();
+        return person;
     }
 }
